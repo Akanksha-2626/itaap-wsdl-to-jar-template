@@ -1,0 +1,1 @@
+# itaap-wsdl-to-jar-template
