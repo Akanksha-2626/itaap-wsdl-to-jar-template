@@ -1,0 +1,42 @@
+variables:
+  - name: Version.MajorMinor
+    value: 1.0
+  - name: Version.Revision
+    value: $[counter(variables['Version.MajorMinor'], 0)]
+  - group: AWS_Credentials
+
+name: $(Version.MajorMinor).$(Version.Revision)
+
+resources:
+  repositories:
+    - repository: self
+      type: GitHub
+      name: philips-internal/itaap-wsdl-to-jar-template
+      connection: krishna-prasad-s
+      pr:
+        branches:
+          include:
+            - main
+        paths:
+          exclude:
+            - README.md
+
+      trigger:
+        branches:
+          include:
+            - main
+        paths:
+          exclude:
+            - README.md
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Build.SourcesDirectory)/build/reports/tests/test
+      artifactName: jarFile
+      artifactType: pipeline
+
